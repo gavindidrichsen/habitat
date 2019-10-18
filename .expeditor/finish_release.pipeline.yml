@@ -8,6 +8,15 @@ expeditor:
         DO_FAKE_RELEASE: "true"
 
 steps:
-  - label: NOOP
+  - label: ":chocolate_bar: Publish Chocolatey package"
     command:
-      - echo "Hello"
+      - powershell .expeditor/scripts/finish_release/publish_to_chocolatey.ps1
+    expeditor:
+      secrets:
+        CHOCO_API_KEY:
+          path: account/static/chocolatey/habitat
+          field: api_key
+      executor:
+        docker:
+          host_os: windows
+          environment:
