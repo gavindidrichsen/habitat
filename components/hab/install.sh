@@ -7,7 +7,8 @@ if [ -n "${DEBUG:-}" ]; then set -x; fi
 
 BT_ROOT="https://api.bintray.com/content/habitat"
 BT_SEARCH="https://api.bintray.com/packages/habitat"
-
+#PCIO_ROOT="https://packages.chef.io"
+PCIO_ROOT="https://chef-automate-artifacts.s3-us-west-2.amazonaws.com" 
 export HAB_LICENSE="accept-no-persist"
 
 main() {
@@ -44,8 +45,13 @@ main() {
   create_workdir
   get_platform
   validate_target
-  get_version
-  download_archive
+  if use_packages_chef_io; then
+    get_packages_chef_io_version
+    download_packages_chef_io_archive
+  else
+    get_bintray_version
+    download_bintray_archive
+  fi
   verify_archive
   extract_archive
   install_hab
@@ -144,7 +150,29 @@ get_platform() {
   fi
 }
 
-get_version() {
+use_packages_chef_io() {
+  need_cmd cut
+
+  if [ "$version" == "" ]; then
+    info "No version specified, using packages.chef.io"
+    return 0
+  else 
+    major="$(echo "${version}" | cut -d'.' -f1)"
+    minor="$(echo "${version}" | cut -d'.' -f2)"
+    if [ "$major" -ge 1 ] || [ "$minor" -ge 89 ]; then
+      info "Specified recent version >= 0.89, using packages.chef.io"
+      return 0
+    fi
+  fi
+  return 1
+}
+
+get_packages_chef_io_version() {
+  # TODO: verify the requested version is available in the channel
+  return 0
+}
+
+get_bintray_version() {
   need_cmd grep
   need_cmd head
   need_cmd sed
@@ -202,7 +230,38 @@ validate_target() {
   fi
 }
 
-download_archive() {
+download_packages_chef_io_archive() {
+  need_cmd mv
+
+  _version="${version:-latest}"
+
+  if [ $_version == "latest" ]; then
+    url="${PCIO_ROOT}/${channel}/latest/habitat/hab-${target}.${ext}"
+  else 
+    url="${PCIO_ROOT}/files/habitat/${version}/hab-${target}.${ext}"
+  fi
+  
+  dl_file "${url}" "${workdir}/hab-${version}.${ext}"
+  dl_file "${url}.sha256sum" "${workdir}/hab-${version}.${ext}.sha256sum"
+
+  archive="hab-${target}.${ext}"
+  sha_file="hab-${target}.${ext}.sha256sum"
+
+  mv -v "${workdir}/hab-${version}.${ext}" "${archive}"
+  mv -v "${workdir}/hab-${version}.${ext}.sha256sum" "${sha_file}"
+  
+  if command -v gpg >/dev/null; then
+    info "GnuPG tooling found, downloading signiatures"
+    #sha_sig_file="${archive}.sha256sum.asc"
+    key_file="${workdir}/habitat.asc"
+
+    #dl_file "${url}.sha256sum.asc" "${sha_sig_file}"
+    #TODO: Where should this come from?
+    dl_file "${url}.asc" "${key_file}" 
+  fi
+}
+
+download_bintray_archive() {
   need_cmd cut
   need_cmd mv
 
@@ -221,23 +280,28 @@ download_archive() {
   info "Renaming downloaded archive files"
   mv -v "${workdir}/hab-latest.${ext}" "${archive}"
   mv -v "${workdir}/hab-latest.${ext}.sha256sum" "${archive}.sha256sum"
+  
+  if command -v gpg >/dev/null; then
+    info "GnuPG tooling found, downloading signiatures"
+    local _sha_sig_url="${url}.sha256sum.asc${query}"
+    local _key_url="https://bintray.com/user/downloadSubjectPublicKey?username=habitat"
+    sha_sig_file="${archive}.sha256sum.asc"
+    key_file="${workdir}/habitat.asc"
+
+    dl_file "${_sha_sig_url}" "${sha_sig_file}"
+    dl_file "${_key_url}" "${key_file}" 
+  fi
 }
 
 verify_archive() {
-  if command -v gpg >/dev/null; then
-    info "GnuPG tooling found, verifying the shasum digest is properly signed"
-    local _sha_sig_url="${url}.sha256sum.asc${query}"
-    local _sha_sig_file="${archive}.sha256sum.asc"
-    local _key_url="https://bintray.com/user/downloadSubjectPublicKey?username=habitat"
-    local _key_file="${workdir}/habitat.asc"
-
-    dl_file "${_sha_sig_url}" "${_sha_sig_file}"
-    dl_file "${_key_url}" "${_key_file}"
-
-    gpg --no-permission-warning --dearmor "${_key_file}"
-    gpg --no-permission-warning \
-      --keyring "${_key_file}.gpg" --verify "${_sha_sig_file}"
-  fi
+  # TODO: Re-enable after we publish sha256sum.asc
+  # if command -v gpg >/dev/null; then
+    # info "GnuPG tooling found, verifying the shasum digest is properly signed"
+#
+    # gpg --no-permission-warning --dearmor "${key_file}"
+    # gpg --no-permission-warning \
+      # --keyring "${key_file}.gpg" --verify "${sha_sig_file}"
+  # fi
 
   info "Verifying the shasum digest matches the downloaded archive"
   ${shasum_cmd} -c "${sha_file}"
@@ -252,8 +316,11 @@ extract_archive() {
       need_cmd zcat
       need_cmd tar
 
-      zcat "${archive}" | tar x -C "${workdir}"
       archive_dir="${archive%.tar.gz}"
+      mkdir ${archive_dir}
+      zcat "${archive}" | tar x -C "${archive_dir}" --strip-components=1
+
+      #archive_dir="${archive%.tar.gz}"
       ;;
     zip)
       need_cmd unzip
@@ -295,7 +362,7 @@ install_hab() {
       # /bin means now you have multiple copies of hab on your system and pathing
       # shenanigans might ensue. Rather than deal with that mess, we do it this
       # way.
-      "${archive_dir}/hab" pkg install --binlink --force --channel "$channel" "$_ident"
+      "${archive_dir}/hab" pkg install --binlink --force --channel "$channel" "$_ident" -u https://bldr.acceptance.habitat.sh
       ;;
     *)
       exit_with "Unrecognized sys when installing: ${sys}" 5
