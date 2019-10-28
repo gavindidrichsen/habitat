@@ -1,11 +1,11 @@
 Describe "Install habitat using install.ps1" {
     It "can install the latest version of Habitat" {
-        components/hab/install.ps1
+        components/hab/install.ps1 -c dev
         $LASTEXITCODE | Should -Be 0
     }
 
     It "can install a specific version of Habitat" {
-        components/hab/install.ps1 -v 0.89.46
+        components/hab/install.ps1 -v 0.89.46 -c dev
         $LASTEXITCODE | Should -Be 0
 
         $result = hab --version

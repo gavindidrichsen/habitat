@@ -112,7 +112,7 @@ Function Get-WorkDir {
 Function Get-Archive-Pcio($channel, $version) {
     # $url = "https://packages.chef.io"
     $url = "https://chef-automate-artifacts.s3-us-west-2.amazonaws.com" 
-    if($version == "latest") {
+    if($version -eq "latest") {
       $hab_url="$url/$channel/latest/habitat/hab-x86_64-windows.zip"
     } else {
       $hab_url="$url/files/habitat/${version}/hab-x86_64-windows.zip"
@@ -265,9 +265,13 @@ Write-Host "Installing Habitat 'hab' program"
 $workdir = Get-WorkDir
 New-Item $workdir -ItemType Directory -Force | Out-Null
 try {
-    $_major=($Version -split ".")[0]
-    $_minor=($Version -split ".")[1]
-    if( $_major -ge 1 -Or $_minor -ge 89 ) {
+    # The $_patch may contain the /release string as well,
+    # This is fine because we only care about major/minor for this 
+    # comparison. 
+    $_major,$_minor,$_patch = $version -split ".",3,"SimpleMatch"
+
+    Write-Host "Version: $Version , Major: $_major , Minor: $_minor"
+    if( $Version -eq "" -Or $_major -ge 1 -Or $_minor -ge 89 ) { 
       $Version = Get-Version-Pcio $Version $Channel
       $archive = Get-Archive-Pcio $channel $version
     } else {
