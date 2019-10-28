@@ -324,8 +324,9 @@ extract_archive() {
     zip)
       need_cmd unzip
 
-      unzip "${archive}" -d "${workdir}"
       archive_dir="${archive%.zip}"
+      # -j "junk paths" Strips leading paths from files,
+      unzip -j "${archive}" -d "${archive_dir}"
       ;;
     *)
       exit_with "Unrecognized file extension when extracting: ${ext}" 4
