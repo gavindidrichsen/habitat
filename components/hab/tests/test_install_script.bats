@@ -53,7 +53,6 @@ installed_target() {
   run components/hab/install.sh -t "x86_64-linux-kernel2" -c dev
 
   [ "$status" -eq 0 ]
-  echo $(installed_target) >&3
   [ "$(installed_target)" == "x86_64-linux-kernel2" ]
 }
 
@@ -63,7 +62,6 @@ installed_target() {
 
   [ "$status" -eq 0 ]
   [ "$(installed_version)" == "hab 0.89.48" ]
-  echo $(installed_target) >&3
   [ "$(installed_target)" == "x86_64-linux-kernel2" ]
 }
 
@@ -73,7 +71,6 @@ installed_target() {
 
   [ "$status" -eq 0 ]
   [ "$(installed_version)" == "hab 0.79.1" ]
-  echo $(installed_target) >&3
   [ "$(installed_target)" == "x86_64-linux-kernel2" ]
 }
 
