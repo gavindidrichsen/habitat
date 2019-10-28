@@ -24,8 +24,6 @@ param (
 $ErrorActionPreference="stop"
 
 Function Get-Version-Pcio($version, $channel) {
-    $manifest = Join-Path (Get-Workdir) "manifest.json"
-
     if(!$version) {
       $version="latest"
     } else {
@@ -41,7 +39,7 @@ Function Get-Version-Pcio($version, $channel) {
       $url = "https://chef-automate-artifacts.s3-us-west-2.amazonaws.com" 
       $manifest_url="$url/files/habitat/$version/manifest.json"
       try {
-          Invoke-WebRequest -Uri "$manifest_url" -ErrorAction Stop -UseBasicParsing
+        $response = Invoke-WebRequest -Uri "$manifest_url" -ErrorAction Stop -UseBasicParsing
       } catch {
         $StatusCode = $_.Exception.Response.StatusCode.value__
         Write-Error "Specified version ($version)[$manifest_url] not found."
