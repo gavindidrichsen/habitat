@@ -19,5 +19,5 @@ echo "--- Testing install.sh"
 # of /bin, but /bin isn't on our path. 
 export PATH=$PATH:/bin
 echo $PATH 
-ls /bin/bats
+ls -la /bin
 bats components/hab/tests/test_install_script.bats
