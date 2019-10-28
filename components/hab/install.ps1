@@ -41,7 +41,6 @@ Function Get-Version-Pcio($version, $channel) {
       $url = "https://chef-automate-artifacts.s3-us-west-2.amazonaws.com" 
       $manifest_url="$url/files/habitat/$version/manifest.json"
       try {
-          Set-PSDebug -Trace 1
           Invoke-WebRequest -Uri "$manifest_url" -ErrorAction Stop
       } catch {
         $StatusCode = $_.Exception.Response.StatusCode.value__
