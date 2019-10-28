@@ -235,7 +235,7 @@ download_packages_chef_io_archive() {
 
   _version="${version:-latest}"
 
-  if [ $_version == "latest" ]; then
+  if [ "$_version" == "latest" ]; then
     url="${PCIO_ROOT}/${channel}/latest/habitat/hab-${target}.${ext}"
   else 
     url="${PCIO_ROOT}/files/habitat/${version}/hab-${target}.${ext}"
@@ -316,7 +316,7 @@ extract_archive() {
       need_cmd tar
 
       archive_dir="${archive%.tar.gz}"
-      mkdir ${archive_dir}
+      mkdir "${archive_dir}"
       zcat "${archive}" | tar x -C "${archive_dir}" --strip-components=1
 
       #archive_dir="${archive%.tar.gz}"
