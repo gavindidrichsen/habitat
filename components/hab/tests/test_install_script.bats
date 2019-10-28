@@ -4,11 +4,11 @@ setup() {
 }
 
 darwin() {
-  [ "$(uname --kernel-name)" == "Darwin" ]
+  [ "$(uname)" == "Darwin" ]
 }
 
 linux() {
-  [ "$(uname --kernel-name)" == "Linux" ]
+  [ "$(uname)" == "Linux" ]
 }
 
 installed_version() {

@@ -39,12 +39,12 @@ Function Get-Version-Pcio($version, $channel) {
       # head.
       # $url = "https://packages.chef.io"
       $url = "https://chef-automate-artifacts.s3-us-west-2.amazonaws.com" 
-      $manifest_url="$url/files/habitat/${version}/manifest.json"
+      $manifest_url="$url/files/habitat/$version/manifest.json"
       try {
           $response = Invoke-WebRequest -Uri "$manifest_url" -ErrorAction Stop
       } catch {
         $StatusCode = $_.Exception.Response.StatusCode.value__
-        Write-Error "Specified version ($version) not found."
+        Write-Error "Specified version ($version)[$manifest_url] not found."
       }
     }
 
