@@ -32,10 +32,10 @@ installed_target() {
 
 @test "Install specific version for x86_64-linux" {
   linux || skip
-  run components/hab/install.sh -v 0.89.43 -c dev
+  run components/hab/install.sh -v 0.89.48 -c dev
 
   [ "$status" -eq 0 ]
-  [ "$(installed_version)" == "hab 0.89.43" ]
+  [ "$(installed_version)" == "hab 0.89.48" ]
   [ "$(installed_target)" == "x86_64-linux" ]
 }
 
@@ -59,10 +59,10 @@ installed_target() {
 
 @test "Install specific version for x86_64-linux-kernel2" {
   linux || skip
-  run components/hab/install.sh -v 0.89.43 -t "x86_64-linux-kernel2" -c dev
+  run components/hab/install.sh -v 0.89.48 -t "x86_64-linux-kernel2" -c dev
 
   [ "$status" -eq 0 ]
-  [ "$(installed_version)" == "hab 0.89.43" ]
+  [ "$(installed_version)" == "hab 0.89.48" ]
   echo $(installed_target) >&3
   [ "$(installed_target)" == "x86_64-linux-kernel2" ]
 }
@@ -86,10 +86,10 @@ installed_target() {
 
 @test "Install specific version for x86_64-darwin" {
   darwin || skip
-  run components/hab/install.sh -v 0.88.0
+  run components/hab/install.sh -v 0.89.48
   
   [ "$status" -eq 0 ]
-  [ "$(installed_version)" == "hab 0.88.0" ]
+  [ "$(installed_version)" == "hab 0.89.48" ]
 }
 
 @test "Install from bintray for x86_84-darwin" {

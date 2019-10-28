@@ -287,7 +287,7 @@ steps:
   ###############################################################
   # MacOS tests
   # TODO: Enable when we can run in Public CI
-  - label: "[unit] :macos: install script"
+  - label: "[unit] :darwin: install script"
     command:
       - .expeditor/scripts/verify/test_install_script.sh
     expeditor:
