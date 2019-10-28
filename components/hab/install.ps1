@@ -23,6 +23,34 @@ param (
 
 $ErrorActionPreference="stop"
 
+Function Get-Version-Pcio($version, $channel) {
+    $manifest = Join-Path (Get-Workdir) "manifest.json"
+
+    if(!$version) {
+      $version="latest"
+    } else {
+      # This differs slightly from the way we fetch with Bintray. With Bintray,
+      # we need to parse json to determine if the requested version is present.
+      # Now, we need to fetch the manifest for the requested version, but
+      # we do not need to parse it as presence of the manifest is sufficient
+      # The downside to this is we can't take $version/$release format identifiers anymore
+      # And a user could theoretically install a version that failed e2e tests
+      # as we don't track channel in the `/files` directory, and channels in s3 only track
+      # head.
+      # $url = "https://packages.chef.io"
+      $url = "https://chef-automate-artifacts.s3-us-west-2.amazonaws.com" 
+      $manifest_url="$url/files/habitat/${version}/manifest.json"
+      try {
+          $response = Invoke-WebRequest -Uri "$manifest_url" -ErrorAction Stop
+      } catch {
+        $StatusCode = $_.Exception.Response.StatusCode.value__
+        Write-Error "Specified version ($version) not found."
+      }
+    }
+
+    $version
+}
+
 Function Get-Version($version, $channel) {
     $jsonFile = Join-Path (Get-WorkDir) "version.json"
 
@@ -79,6 +107,35 @@ Function Get-File($url, $dst) {
 
 Function Get-WorkDir {
     Join-Path $env:temp "hab.XXXX"
+}
+
+Function Get-Archive-Pcio($channel, $version) {
+    # $url = "https://packages.chef.io"
+    $url = "https://chef-automate-artifacts.s3-us-west-2.amazonaws.com" 
+    if($version == "latest") {
+      $hab_url="$url/$channel/latest/habitat/hab-x86_64-windows.zip"
+    } else {
+      $hab_url="$url/files/habitat/${version}/hab-x86_64-windows.zip"
+    }
+    $sha_url="$hab_url.sha256sum"
+    $hab_dest = (Join-Path (Get-WorkDir) "hab.zip")
+    $sha_dest = (Join-Path (Get-WorkDir) "hab.zip.shasum256")
+
+    Get-File $hab_url $hab_dest
+    $result = @{ "zip" = $hab_dest }
+
+    # Note that this will fail on versions less than 0.71.0
+    # when we did not upload shasum files to bintray.
+    # NOTE: This is left in place because, while we don't ship <0.71.0
+    # from s3 today, the intent is to move old releases over 
+    try {
+        Get-File $sha_url $sha_dest
+        $result["shasum"] = (Get-Content $sha_dest).Split()[0]
+    }
+    catch {
+        Write-Warning "No shasum exists for $version. Skipping validation."
+    }
+    $result
 }
 
 Function Get-Archive($channel, $version) {
