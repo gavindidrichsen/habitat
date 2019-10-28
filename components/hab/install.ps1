@@ -265,8 +265,15 @@ Write-Host "Installing Habitat 'hab' program"
 $workdir = Get-WorkDir
 New-Item $workdir -ItemType Directory -Force | Out-Null
 try {
-    $Version = Get-Version $Version $Channel
-    $archive = Get-Archive $channel $version
+    $_major=($Version -split ".")[0]
+    $_minor=($Version -split ".")[1]
+    if( $_major -ge 1 -Or $_minor -ge 89 ) {
+      $Version = Get-Version-Pcio $Version $Channel
+      $archive = Get-Archive-Pcio $channel $version
+    } else {
+      $Version = Get-Version $Version $Channel
+      $archive = Get-Archive $channel $version
+    }
     if($archive.shasum) {
         Assert-Shasum $archive
     }
