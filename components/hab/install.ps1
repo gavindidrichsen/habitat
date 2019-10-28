@@ -31,17 +31,18 @@ Function Get-Version-Pcio($version, $channel) {
     } else {
       # This differs slightly from the way we fetch with Bintray. With Bintray,
       # we need to parse json to determine if the requested version is present.
-      # Now, we need to fetch the manifest for the requested version, but
-      # we do not need to parse it as presence of the manifest is sufficient
-      # The downside to this is we can't take $version/$release format identifiers anymore
-      # And a user could theoretically install a version that failed e2e tests
-      # as we don't track channel in the `/files` directory, and channels in s3 only track
-      # head.
+      # With packages.chef.io, we need to fetch the manifest for the requested version, 
+      # but we do not need to parse it as presence of the manifest is sufficient.
+      # The downside to this is we can't take $version/$release format identifiers anymore.
+      # A user could theoretically install a version that failed e2e tests as we don't 
+      # track channel in the `/files` directory, and channels in s3 only track head.
+
       # $url = "https://packages.chef.io"
       $url = "https://chef-automate-artifacts.s3-us-west-2.amazonaws.com" 
       $manifest_url="$url/files/habitat/$version/manifest.json"
       try {
-          $response = Invoke-WebRequest -Uri "$manifest_url" -ErrorAction Stop
+          Set-PSDebug -Trace 1
+          Invoke-WebRequest -Uri "$manifest_url" -ErrorAction Stop
       } catch {
         $StatusCode = $_.Exception.Response.StatusCode.value__
         Write-Error "Specified version ($version)[$manifest_url] not found."
@@ -270,7 +271,6 @@ try {
     # comparison. 
     $_major,$_minor,$_patch = $version -split ".",3,"SimpleMatch"
 
-    Write-Host "Version: $Version , Major: $_major , Minor: $_minor"
     if( $Version -eq "" -Or $_major -ge 1 -Or $_minor -ge 89 ) { 
       $Version = Get-Version-Pcio $Version $Channel
       $archive = Get-Archive-Pcio $channel $version
