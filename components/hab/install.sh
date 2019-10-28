@@ -252,11 +252,10 @@ download_packages_chef_io_archive() {
   
   if command -v gpg >/dev/null; then
     info "GnuPG tooling found, downloading signiatures"
-    #sha_sig_file="${archive}.sha256sum.asc"
+    sha_sig_file="${archive}.sha256sum.asc"
     key_file="${workdir}/habitat.asc"
 
-    #dl_file "${url}.sha256sum.asc" "${sha_sig_file}"
-    #TODO: Where should this come from?
+    dl_file "${url}.sha256sum.asc" "${sha_sig_file}"
     dl_file "${url}.asc" "${key_file}" 
   fi
 }
@@ -295,13 +294,13 @@ download_bintray_archive() {
 
 verify_archive() {
   # TODO: Re-enable after we publish sha256sum.asc
-  # if command -v gpg >/dev/null; then
-    # info "GnuPG tooling found, verifying the shasum digest is properly signed"
-#
-    # gpg --no-permission-warning --dearmor "${key_file}"
-    # gpg --no-permission-warning \
-      # --keyring "${key_file}.gpg" --verify "${sha_sig_file}"
-  # fi
+  if command -v gpg >/dev/null; then
+    info "GnuPG tooling found, verifying the shasum digest is properly signed"
+
+    gpg --no-permission-warning --dearmor "${key_file}"
+    gpg --no-permission-warning \
+      --keyring "${key_file}.gpg" --verify "${sha_sig_file}"
+  fi
 
   info "Verifying the shasum digest matches the downloaded archive"
   ${shasum_cmd} -c "${sha_file}"
