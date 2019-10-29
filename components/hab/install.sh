@@ -7,8 +7,7 @@ if [ -n "${DEBUG:-}" ]; then set -x; fi
 
 BT_ROOT="https://api.bintray.com/content/habitat"
 BT_SEARCH="https://api.bintray.com/packages/habitat"
-#PCIO_ROOT="https://packages.chef.io"
-PCIO_ROOT="https://chef-automate-artifacts.s3-us-west-2.amazonaws.com" 
+PCIO_ROOT="https://packages.chef.io/files"
 export HAB_LICENSE="accept-no-persist"
 
 main() {
@@ -236,9 +235,9 @@ download_packages_chef_io_archive() {
   _version="${version:-latest}"
 
   if [ "$_version" == "latest" ]; then
-    url="${PCIO_ROOT}/${channel}/latest/habitat/hab-${target}.${ext}"
+    url="${PCIO_ROOT}/${channel}/habitat/latest/hab-${target}.${ext}"
   else 
-    url="${PCIO_ROOT}/files/habitat/${version}/hab-${target}.${ext}"
+    url="${PCIO_ROOT}/habitat/${version}/hab-${target}.${ext}"
   fi
   
   dl_file "${url}" "${workdir}/hab-${version}.${ext}"

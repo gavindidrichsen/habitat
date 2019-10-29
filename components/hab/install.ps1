@@ -23,6 +23,8 @@ param (
 
 $ErrorActionPreference="stop"
 
+Set-Variable packagesChefioRootUrl -Option ReadOnly -value "https://packages.chef.io/files"
+
 Function Get-Version-Pcio($version, $channel) {
     if(!$version) {
       $version="latest"
@@ -35,9 +37,8 @@ Function Get-Version-Pcio($version, $channel) {
       # A user could theoretically install a version that failed e2e tests as we don't 
       # track channel in the `/files` directory, and channels in s3 only track head.
 
-      # $url = "https://packages.chef.io"
-      $url = "https://chef-automate-artifacts.s3-us-west-2.amazonaws.com" 
-      $manifest_url="$url/files/habitat/$version/manifest.json"
+      $url = $packagesChefioRootUrl
+      $manifest_url="habitat/$version/manifest.json"
       try {
         $response = Invoke-WebRequest -Uri "$manifest_url" -ErrorAction Stop -UseBasicParsing
       } catch {
@@ -108,12 +109,11 @@ Function Get-WorkDir {
 }
 
 Function Get-Archive-Pcio($channel, $version) {
-    # $url = "https://packages.chef.io"
-    $url = "https://chef-automate-artifacts.s3-us-west-2.amazonaws.com" 
+    $url = $packagesChefioRootUrl
     if($version -eq "latest") {
       $hab_url="$url/$channel/latest/habitat/hab-x86_64-windows.zip"
     } else {
-      $hab_url="$url/files/habitat/${version}/hab-x86_64-windows.zip"
+      $hab_url="$url/habitat/${version}/hab-x86_64-windows.zip"
     }
     $sha_url="$hab_url.sha256sum"
     $hab_dest = (Join-Path (Get-WorkDir) "hab.zip")
