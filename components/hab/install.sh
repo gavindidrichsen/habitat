@@ -156,8 +156,10 @@ use_packages_chef_io() {
     info "No version specified, using packages.chef.io"
     return 0
   else 
-    local major="$(echo "${version}" | cut -d'.' -f1)"
-    local minor="$(echo "${version}" | cut -d'.' -f2)"
+    local major 
+    local minor
+    major="$(echo "${version}" | cut -d'.' -f1)"
+    minor="$(echo "${version}" | cut -d'.' -f2)"
     if [ "$major" -ge 1 ] || [ "$minor" -ge 89 ]; then
       info "Specified recent version >= 0.89, using packages.chef.io"
       return 0
