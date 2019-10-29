@@ -156,8 +156,8 @@ use_packages_chef_io() {
     info "No version specified, using packages.chef.io"
     return 0
   else 
-    major="$(echo "${version}" | cut -d'.' -f1)"
-    minor="$(echo "${version}" | cut -d'.' -f2)"
+    local major="$(echo "${version}" | cut -d'.' -f1)"
+    local minor="$(echo "${version}" | cut -d'.' -f2)"
     if [ "$major" -ge 1 ] || [ "$minor" -ge 89 ]; then
       info "Specified recent version >= 0.89, using packages.chef.io"
       return 0
@@ -246,11 +246,11 @@ download_packages_chef_io_archive() {
   archive="hab-${target}.${ext}"
   sha_file="hab-${target}.${ext}.sha256sum"
 
-  mv -v "${workdir}/hab-${version}.${ext}" "${archive}"
-  mv -v "${workdir}/hab-${version}.${ext}.sha256sum" "${sha_file}"
+  mv -v "${workdir}/hab-${_version}.${ext}" "${archive}"
+  mv -v "${workdir}/hab-${_version}.${ext}.sha256sum" "${sha_file}"
   
   if command -v gpg >/dev/null; then
-    info "GnuPG tooling found, downloading signiatures"
+    info "GnuPG tooling found, downloading signatures"
     sha_sig_file="${archive}.sha256sum.asc"
     key_file="${workdir}/habitat.asc"
 
@@ -280,7 +280,7 @@ download_bintray_archive() {
   mv -v "${workdir}/hab-latest.${ext}.sha256sum" "${archive}.sha256sum"
   
   if command -v gpg >/dev/null; then
-    info "GnuPG tooling found, downloading signiatures"
+    info "GnuPG tooling found, downloading signatures"
     local _sha_sig_url="${url}.sha256sum.asc${query}"
     local _key_url="https://bintray.com/user/downloadSubjectPublicKey?username=habitat"
     sha_sig_file="${archive}.sha256sum.asc"
@@ -292,7 +292,6 @@ download_bintray_archive() {
 }
 
 verify_archive() {
-  # TODO: Re-enable after we publish sha256sum.asc
   if command -v gpg >/dev/null; then
     info "GnuPG tooling found, verifying the shasum digest is properly signed"
 
@@ -318,7 +317,6 @@ extract_archive() {
       mkdir "${archive_dir}"
       zcat "${archive}" | tar x -C "${archive_dir}" --strip-components=1
 
-      #archive_dir="${archive%.tar.gz}"
       ;;
     zip)
       need_cmd unzip
