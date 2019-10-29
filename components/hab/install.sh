@@ -242,8 +242,8 @@ download_packages_chef_io_archive() {
     url="${PCIO_ROOT}/habitat/${version}/hab-${target}.${ext}"
   fi
   
-  dl_file "${url}" "${workdir}/hab-${version}.${ext}"
-  dl_file "${url}.sha256sum" "${workdir}/hab-${version}.${ext}.sha256sum"
+  dl_file "${url}" "${workdir}/hab-${_version}.${ext}"
+  dl_file "${url}.sha256sum" "${workdir}/hab-${_version}.${ext}.sha256sum"
 
   archive="hab-${target}.${ext}"
   sha_file="hab-${target}.${ext}.sha256sum"
