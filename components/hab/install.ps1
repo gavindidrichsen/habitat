@@ -25,7 +25,9 @@ $ErrorActionPreference="stop"
 
 Set-Variable packagesChefioRootUrl -Option ReadOnly -value "https://packages.chef.io/files"
 
-Function Get-Version-Pcio($version, $channel) {
+# Gets the manifest from packages.chef.io in order to verify the 
+# requested version exists.
+Function Get-PackagesChefioVersion($version, $channel) {
     if(!$version) {
       $version="latest"
     } else {
@@ -42,14 +44,14 @@ Function Get-Version-Pcio($version, $channel) {
         $response = Invoke-WebRequest -Uri "$manifest_url" -ErrorAction Stop -UseBasicParsing
       } catch {
         $StatusCode = $_.Exception.Response.StatusCode.value__
-        Write-Error "Specified version ($version)[$manifest_url] not found."
+        Write-Error "Specified version ($version)[$manifest_url] not found. HTTP Status Code: $StatusCode"
       }
     }
 
     $version
 }
 
-Function Get-Version($version, $channel) {
+Function Get-BintrayVersion($version, $channel) {
     $jsonFile = Join-Path (Get-WorkDir) "version.json"
 
     # bintray expects a '-' to separate version and release and not '/'
@@ -107,7 +109,8 @@ Function Get-WorkDir {
     Join-Path $env:temp "hab.XXXX"
 }
 
-Function Get-Archive-Pcio($channel, $version) {
+# Downloads the requested archive from packages.chef.io
+Function Get-PackagesChefioArchive($channel, $version) {
     $url = $packagesChefioRootUrl
     if($version -eq "latest") {
       $hab_url="$url/$channel/habitat/latest/hab-x86_64-windows.zip"
@@ -135,7 +138,7 @@ Function Get-Archive-Pcio($channel, $version) {
     $result
 }
 
-Function Get-Archive($channel, $version) {
+Function Get-BintrayArchive($channel, $version) {
     $url = "https://api.bintray.com/content/habitat/$channel/windows/x86_64/hab-$version-x86_64-windows.zip"
     $query = "?bt_package=hab-x86_64-windows"
 
@@ -257,22 +260,25 @@ Function Assert-Habitat($ident) {
     }
 }
 
+Function Test-UsePackagesChefio($version) {
+    # The $_patch may contain the /release string as well.
+    # This is fine because we only care about major/minor for this 
+    # comparison. 
+    $_major,$_minor,$_patch = $version -split ".",3,"SimpleMatch"
+    if(!$version -Or ([Version]::new($_major, $_minor) -ge [Version]::new("0.89")))
+}
+
 Write-Host "Installing Habitat 'hab' program"
 
 $workdir = Get-WorkDir
 New-Item $workdir -ItemType Directory -Force | Out-Null
 try {
-    # The $_patch may contain the /release string as well,
-    # This is fine because we only care about major/minor for this 
-    # comparison. 
-    $_major,$_minor,$_patch = $version -split ".",3,"SimpleMatch"
-
-    if( $Version -eq "" -Or $_major -ge 1 -Or $_minor -ge 89 ) { 
-      $Version = Get-Version-Pcio $Version $Channel
-      $archive = Get-Archive-Pcio $channel $version
+    if(Test-UsePackagesChefio($Version)) { 
+      $Version = Get-PackagesChefioVersion $Version $Channel
+      $archive = Get-PackagesChefioArchive $channel $version
     } else {
-      $Version = Get-Version $Version $Channel
-      $archive = Get-Archive $channel $version
+      $Version = Get-BintrayVersion $Version $Channel
+      $archive = Get-BintrayArchive $channel $version
     }
     if($archive.shasum) {
         Assert-Shasum $archive

@@ -7,7 +7,7 @@ if [ -n "${DEBUG:-}" ]; then set -x; fi
 
 BT_ROOT="https://api.bintray.com/content/habitat"
 BT_SEARCH="https://api.bintray.com/packages/habitat"
-PCIO_ROOT="https://packages.chef.io/files"
+readonly pcio_root="https://packages.chef.io/files"
 export HAB_LICENSE="accept-no-persist"
 
 main() {
@@ -44,9 +44,8 @@ main() {
   create_workdir
   get_platform
   validate_target
-  if use_packages_chef_io; then
-    get_packages_chef_io_version
-    download_packages_chef_io_archive
+  if use_packages_chef_io "$version"; then
+    download_packages_chef_io_archive "$version" "$channel" "$target"
   else
     get_bintray_version
     download_bintray_archive
@@ -152,7 +151,10 @@ get_platform() {
 use_packages_chef_io() {
   need_cmd cut
 
-  if [ "$version" == "" ]; then
+  local version
+  version="${1:-latest}"
+
+  if [ "$version" == "latest" ]; then
     info "No version specified, using packages.chef.io"
     return 0
   else 
@@ -166,11 +168,6 @@ use_packages_chef_io() {
     fi
   fi
   return 1
-}
-
-get_packages_chef_io_version() {
-  # TODO: verify the requested version is available in the channel
-  return 0
 }
 
 get_bintray_version() {
@@ -233,20 +230,23 @@ validate_target() {
 
 download_packages_chef_io_archive() {
   need_cmd mv
-
-  _version="${version:-latest}"
+  
+  local -r _version="${1:-latest}"
+  local -r _channel="${2:?}"
+  local -r _target="${3:?}"
+  local url
 
   if [ "$_version" == "latest" ]; then
-    url="${PCIO_ROOT}/${channel}/habitat/latest/hab-${target}.${ext}"
+    url="${pcio_root}/${_channel}/habitat/latest/hab-${_target}.${ext}"
   else 
-    url="${PCIO_ROOT}/habitat/${version}/hab-${target}.${ext}"
+    url="${pcio_root}/habitat/${_version}/hab-${_target}.${ext}"
   fi
   
   dl_file "${url}" "${workdir}/hab-${_version}.${ext}"
   dl_file "${url}.sha256sum" "${workdir}/hab-${_version}.${ext}.sha256sum"
 
-  archive="hab-${target}.${ext}"
-  sha_file="hab-${target}.${ext}.sha256sum"
+  archive="hab-${_target}.${ext}"
+  sha_file="hab-${_target}.${ext}.sha256sum"
 
   mv -v "${workdir}/hab-${_version}.${ext}" "${archive}"
   mv -v "${workdir}/hab-${_version}.${ext}.sha256sum" "${sha_file}"
@@ -317,7 +317,7 @@ extract_archive() {
 
       archive_dir="${archive%.tar.gz}"
       mkdir "${archive_dir}"
-      zcat "${archive}" | tar x -C "${archive_dir}" --strip-components=1
+      zcat "${archive}" | tar --extract --directory "${archive_dir}" --strip-components=1
 
       ;;
     zip)
