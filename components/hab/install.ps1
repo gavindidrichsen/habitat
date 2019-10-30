@@ -25,32 +25,6 @@ $ErrorActionPreference="stop"
 
 Set-Variable packagesChefioRootUrl -Option ReadOnly -value "https://packages.chef.io/files"
 
-# Gets the manifest from packages.chef.io in order to verify the 
-# requested version exists.
-Function Get-PackagesChefioVersion($version, $channel) {
-    if(!$version) {
-      $version="latest"
-    } else {
-      # This differs slightly from the way we fetch with Bintray. With Bintray,
-      # we need to parse json to determine if the requested version is present.
-      # With packages.chef.io, we need to fetch the manifest for the requested version, 
-      # but we do not need to parse it as presence of the manifest is sufficient.
-      # The downside to this is we can't take $version/$release format identifiers anymore.
-      # A user could theoretically install a version that failed e2e tests as we don't 
-      # track channel in the `/files` directory, and channels in s3 only track head.
-
-      $manifest_url="$packagesChefioRootUrl/habitat/$version/manifest.json"
-      try {
-        $response = Invoke-WebRequest -Uri "$manifest_url" -ErrorAction Stop -UseBasicParsing
-      } catch {
-        $StatusCode = $_.Exception.Response.StatusCode.value__
-        Write-Error "Specified version ($version)[$manifest_url] not found. HTTP Status Code: $StatusCode"
-      }
-    }
-
-    $version
-}
-
 Function Get-BintrayVersion($version, $channel) {
     $jsonFile = Join-Path (Get-WorkDir) "version.json"
 
@@ -274,7 +248,6 @@ $workdir = Get-WorkDir
 New-Item $workdir -ItemType Directory -Force | Out-Null
 try {
     if(Test-UsePackagesChefio($Version)) { 
-      $Version = Get-PackagesChefioVersion $Version $Channel
       $archive = Get-PackagesChefioArchive $channel $version
     } else {
       $Version = Get-BintrayVersion $Version $Channel
