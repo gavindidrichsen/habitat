@@ -3,7 +3,7 @@ setup() {
     rm -f /bin/hab
     rm -rf /hab/pkgs/core/hab
   else
-    skip "Not running in CI"
+    echo "Not running in CI, skipping cleanup"
   fi
 }
 

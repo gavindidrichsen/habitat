@@ -254,10 +254,11 @@ download_packages_chef_io_archive() {
   if command -v gpg >/dev/null; then
     info "GnuPG tooling found, downloading signatures"
     sha_sig_file="${archive}.sha256sum.asc"
-    key_file="${workdir}/habitat.asc"
+    key_file="${workdir}/chef.asc"
+    local _key_url="https://packages.chef.io/chef.asc"
 
     dl_file "${url}.sha256sum.asc" "${sha_sig_file}"
-    dl_file "${url}.asc" "${key_file}" 
+    dl_file "${_key_url}" "${key_file}" 
   fi
 }
 
