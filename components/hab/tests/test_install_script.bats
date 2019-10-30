@@ -1,6 +1,10 @@
 setup() {
-  rm -f /bin/hab
-  rm -rf /hab/pkgs/core/hab
+  if [ -n "$CI" ]; then
+    rm -f /bin/hab
+    rm -rf /hab/pkgs/core/hab
+  else
+    skip "Not running in CI"
+  fi
 }
 
 darwin() {
@@ -23,7 +27,7 @@ installed_target() {
 }
 
 @test "Install latest for x86_86-linux" {
-  linux || skip
+  linux || skip "Did not detect a Linux system"
   run components/hab/install.sh -c dev
 
   [ "$status" -eq 0 ]
@@ -31,7 +35,7 @@ installed_target() {
 }
 
 @test "Install specific version for x86_64-linux" {
-  linux || skip
+  linux || skip "Did not detect a Linux system"
   run components/hab/install.sh -v 0.89.48 -c dev
 
   [ "$status" -eq 0 ]
@@ -40,7 +44,7 @@ installed_target() {
 }
 
 @test "Install from bintray for x86_84-linux" {
-  linux || skip
+  linux || skip "Did not detect a Linux system"
   run components/hab/install.sh -v 0.79.1 
 
   [ "$status" -eq 0 ]
@@ -49,7 +53,7 @@ installed_target() {
 }
 
 @test "Install latest for x86_64-linux-kernel2" {
-  linux || skip
+  linux || skip "Did not detect a Linux system"
   run components/hab/install.sh -t "x86_64-linux-kernel2" -c dev
 
   [ "$status" -eq 0 ]
@@ -57,7 +61,7 @@ installed_target() {
 }
 
 @test "Install specific version for x86_64-linux-kernel2" {
-  linux || skip
+  linux || skip "Did not detect a Linux system"
   run components/hab/install.sh -v 0.89.48 -t "x86_64-linux-kernel2" -c dev
 
   [ "$status" -eq 0 ]
@@ -66,7 +70,7 @@ installed_target() {
 }
 
 @test "Install from bintray for x86_84-linux-kernel2" {
-  linux || skip
+  linux || skip "Did not detect a Linux system"
   run components/hab/install.sh -v 0.79.1 -t "x86_64-linux-kernel2"
 
   [ "$status" -eq 0 ]
@@ -75,14 +79,14 @@ installed_target() {
 }
 
 @test "Install latest for x86_86-darwin" {
-  darwin || skip
+  darwin || skip "Did not detect a Darwin system"
   run components/hab/install.sh -c dev
 
   [ "$status" -eq 0 ]
 }
 
 @test "Install specific version for x86_64-darwin" {
-  darwin || skip
+  darwin || skip "Did not detect a Darwin system"
   run components/hab/install.sh -v 0.89.48
   
   [ "$status" -eq 0 ]
@@ -90,7 +94,7 @@ installed_target() {
 }
 
 @test "Install from bintray for x86_84-darwin" {
-  darwin || skip
+  darwin || skip "Did not detect a Darwin system"
   run components/hab/install.sh -v 0.79.1
 
   [ "$status" -eq 0 ]

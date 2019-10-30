@@ -265,7 +265,7 @@ Function Test-UsePackagesChefio($version) {
     # This is fine because we only care about major/minor for this 
     # comparison. 
     $_major,$_minor,$_patch = $version -split ".",3,"SimpleMatch"
-    if(!$version -Or ([Version]::new($_major, $_minor) -ge [Version]::new("0.89")))
+    !$version -Or ([Version]::new($_major, $_minor) -ge [Version]::new("0.89"))
 }
 
 Write-Host "Installing Habitat 'hab' program"
