@@ -86,7 +86,7 @@ Function Get-WorkDir {
 # Downloads the requested archive from packages.chef.io
 Function Get-PackagesChefioArchive($channel, $version) {
     $url = $packagesChefioRootUrl
-    if($version -eq "latest") {
+    if(!$version -Or $version -eq "latest") {
       $hab_url="$url/$channel/habitat/latest/hab-x86_64-windows.zip"
     } else {
       $hab_url="$url/habitat/${version}/hab-x86_64-windows.zip"
