@@ -26,7 +26,7 @@ $ErrorActionPreference="stop"
 Set-Variable packagesChefioRootUrl -Option ReadOnly -value "https://packages.chef.io/files"
 
 Function Get-BintrayVersion($version, $channel) {
-    $jsonFile = Join-Path (Get-WorkDir) "version.json"
+    $jsonFile = Join-Path ($workdir) "version.json"
 
     # bintray expects a '-' to separate version and release and not '/'
     $version = $version.Replace("/", "-")
@@ -80,7 +80,9 @@ Function Get-File($url, $dst) {
 }
 
 Function Get-WorkDir {
-    Join-Path $env:temp "hab.XXXX"
+  $parent = [System.IO.Path]::GetTempPath()
+  [string] $name = [System.Guid]::NewGuid()
+  New-Item -ItemType Directory -Path (Join-Path $parent $name)
 }
 
 # Downloads the requested archive from packages.chef.io
@@ -92,8 +94,8 @@ Function Get-PackagesChefioArchive($channel, $version) {
       $hab_url="$url/habitat/${version}/hab-x86_64-windows.zip"
     }
     $sha_url="$hab_url.sha256sum"
-    $hab_dest = (Join-Path (Get-WorkDir) "hab.zip")
-    $sha_dest = (Join-Path (Get-WorkDir) "hab.zip.shasum256")
+    $hab_dest = (Join-Path ($workdir) "hab.zip")
+    $sha_dest = (Join-Path ($workdir) "hab.zip.shasum256")
 
     Get-File $hab_url $hab_dest
     $result = @{ "zip" = $hab_dest }
@@ -118,8 +120,8 @@ Function Get-BintrayArchive($channel, $version) {
 
     $hab_url="$url$query"
     $sha_url="$url.sha256sum$query"
-    $hab_dest = (Join-Path (Get-WorkDir) "hab.zip")
-    $sha_dest = (Join-Path (Get-WorkDir) "hab.zip.shasum256")
+    $hab_dest = (Join-Path ($workdir) "hab.zip")
+    $sha_dest = (Join-Path ($workdir) "hab.zip.shasum256")
 
     Get-File $hab_url $hab_dest
     $result = @{ "zip" = $hab_dest }
@@ -173,7 +175,7 @@ Function Install-Habitat {
     $habPath = Join-Path $env:ProgramData Habitat
     if(Test-Path $habPath) { Remove-Item $habPath -Recurse -Force }
     New-Item $habPath -ItemType Directory | Out-Null
-    $folder = (Get-ChildItem (Join-Path (Get-WorkDir) "hab-*"))
+    $folder = (Get-ChildItem (Join-Path ($workdir) "hab-*"))
     Copy-Item "$($folder.FullName)\*" $habPath
     $env:PATH = New-PathString -StartingPath $env:PATH -Path $habPath
     $machinePath = [System.Environment]::GetEnvironmentVariable("PATH", "Machine")
@@ -200,7 +202,7 @@ Function New-PathString([string]$StartingPath, [string]$Path) {
 }
 
 Function Expand-Zip($zipPath) {
-    $dest = Get-WorkDir
+    $dest = $workdir
     try {
         # Works on .Net 4.5 and up (as well as .Net Core)
         # Yes on PS v5 and up we have Expand-Archive but this works on PS v4 too
