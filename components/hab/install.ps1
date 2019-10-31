@@ -240,8 +240,11 @@ Function Test-UsePackagesChefio($version) {
     # The $_patch may contain the /release string as well.
     # This is fine because we only care about major/minor for this 
     # comparison. 
+
     $_major,$_minor,$_patch = $version -split ".",3,"SimpleMatch"
-    !$version -Or $_major -ge 1 -Or $_minor -ge 89
+    $v1 = New-Object -TypeName Version -ArgumentList $_major,$_minor
+    $v2 = New-Object -TypeName Version -ArgumentList "0.89"
+    !$version -Or ($v1 -ge $v2)
 }
 
 Write-Host "Installing Habitat 'hab' program"
