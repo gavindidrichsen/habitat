@@ -925,8 +925,9 @@ fn sub_pkg_bulkupload(ui: &mut UI, m: &ArgMatches<'_>) -> Result<()> {
                   format!("{} origin(s) that may need to be created.", origins.len()))?;
         if !origins.is_empty() && !accept {
             ui.warn("Your Builder id will own any origin created. Be sure this is what you \
-                     intend!"
-                             .to_string())?;
+                     intend!\nOwnership transfer is not yet implemented and will require SQL \
+                     commands."
+                               .to_string())?;
             if !ask_create_origins(ui)? {
                 process::exit(1);
             };
