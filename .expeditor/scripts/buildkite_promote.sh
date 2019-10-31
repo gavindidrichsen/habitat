@@ -65,6 +65,10 @@ if [[ "${BUILDKITE_BUILD_CREATOR}" == "${valid_build_creator}" ]]; then
     promote_version_in_s3 "${version}" "${destination_channel}"
 
     echo "--- Purging fastly cache for 'dev' channel"
+    # While this is probably not necessary as we generally `hab pkg install` for packages
+    # from the 'dev' channel,  we did run into issues with wedged packages as we were 
+    # testing the migration to packages.chef.io. Rather than potentially waste hours of 
+    # troubleshooting down the road, we'll purge the 'dev' channel at the end of every build.
     .expeditor/scripts/purge_cdn.sh
 
 else
