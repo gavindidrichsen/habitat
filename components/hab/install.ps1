@@ -241,7 +241,7 @@ Function Test-UsePackagesChefio($version) {
     # This is fine because we only care about major/minor for this 
     # comparison. 
     $_major,$_minor,$_patch = $version -split ".",3,"SimpleMatch"
-    !$version -Or $version -ge 1 -Or $version -ge 89
+    !$version -Or $_major -ge 1 -Or $_minor -ge 89
 }
 
 Write-Host "Installing Habitat 'hab' program"
