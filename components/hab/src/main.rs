@@ -38,7 +38,9 @@ use habitat_common::{self as common,
                                                  LocalPackageUsage},
                      output,
                      types::ListenCtlAddr,
-                     ui::{Status,
+                     ui::{Glyph,
+                          Status,
+                          UIReader,
                           UIWriter,
                           NONINTERACTIVE_ENVVAR,
                           UI},
@@ -56,6 +58,7 @@ use habitat_core::{crypto::{init,
                         launcher_root_path},
                    os::process::ShutdownTimeout,
                    package::{target,
+                             PackageArchive,
                              PackageIdent,
                              PackageTarget},
                    service::{HealthCheckInterval,
@@ -885,6 +888,8 @@ fn sub_pkg_bulkupload(ui: &mut UI, m: &ArgMatches<'_>) -> Result<()> {
     } else {
         BuildOnUpload::Disable
     };
+    let create_origins = m.is_present("CREATE_ORIGINS");
+    let accept = m.is_present("ACCEPT");
     let token = auth_token_param_or_env(m)?;
     const OPTIONS: glob::MatchOptions = glob::MatchOptions { case_sensitive:              true,
                                                              require_literal_separator:   true,
@@ -901,9 +906,36 @@ fn sub_pkg_bulkupload(ui: &mut UI, m: &ArgMatches<'_>) -> Result<()> {
                       &artifact_path.display(),
                       key_path.display()))?;
     ui.status(Status::Found,
-              format!("{} artifacts for upload.", artifact_paths.len()))?;
+              format!("{} artifact(s) for upload.", artifact_paths.len()))?;
 
-    for artifact_path in artifact_paths {
+    if create_origins {
+        let mut origins: Vec<String> = Vec::new();
+        ui.status(Status::Discovering,
+                  "origin names from artifact metadata..".to_string())?;
+        for artifact_path in &artifact_paths {
+            let ident = PackageArchive::new(&artifact_path).ident()?;
+            origins.push(ident.origin);
+        }
+        origins.sort();
+        origins.dedup();
+        for origin in &origins {
+            ui.status(Status::Custom(Glyph::CheckMark, "".to_string()), origin)?;
+        }
+        ui.status(Status::Found,
+                  format!("{} origin(s) that may need to be created.", origins.len()))?;
+        if !origins.is_empty() && !accept {
+            ui.warn("Your Builder id will own any origin created. Be sure this is what you \
+                     intend!"
+                             .to_string())?;
+            if !ask_create_origins(ui)? {
+                process::exit(1);
+            };
+        };
+        for origin in origins {
+            command::origin::create::start(ui, &url, &token, &origin)?;
+        }
+    };
+    for artifact_path in &artifact_paths {
         command::pkg::upload::start(ui,
                                     &url,
                                     &additional_release_channel,
@@ -913,7 +945,6 @@ fn sub_pkg_bulkupload(ui: &mut UI, m: &ArgMatches<'_>) -> Result<()> {
                                     auto_build,
                                     &key_path)?;
     }
-
     Ok(())
 }
 
@@ -1643,6 +1674,11 @@ fn active_target() -> PackageTarget {
         target::X86_64_DARWIN => target::X86_64_LINUX,
         t => t,
     }
+}
+
+fn ask_create_origins(ui: &mut UI) -> Result<bool> {
+    Ok(ui.prompt_yes_no("Do you accept creation and ownership of origins if they do not exist?",
+                        Some(true))?)
 }
 
 fn install_sources_from_matches(matches: &ArgMatches<'_>) -> Result<Vec<InstallSource>> {
