@@ -64,6 +64,9 @@ if [[ "${BUILDKITE_BUILD_CREATOR}" == "${valid_build_creator}" ]]; then
     echo "--- Promoting binary packages and manifest to the ${destination_channel} channel in S3"
     promote_version_in_s3 "${version}" "${destination_channel}"
 
+    echo "--- Purging fastly cache for 'dev' channel"
+    .expeditor/scripts/purge_cdn.sh
+
 else
     echo "--- NOT PROMOTING: Build triggered by ${BUILDKITE_BUILD_CREATOR} and *not* ${valid_build_creator}"
 fi
