@@ -162,9 +162,6 @@ Function Get-Sha256($src) {
 
 Function Assert-Shasum($archive) {
     Write-Host "Verifying the shasum digest matches the downloaded archive"
-    Write-Host "DEBUG: $archive.zip"
-    Write-Host "DEBUG: $archive.shasum"
-    Write-Host "DEBUG: $($archive.shasum)"
     $actualShasum = Get-Sha256 $archive.zip
     if($actualShasum -ne $archive.shasum) {
         Write-Error "Checksum '$($archive.shasum)' invalid."
