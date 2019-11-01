@@ -220,97 +220,97 @@ steps:
             - BUILD_PKG_TARGET=x86_64-windows
             - BUILDKITE_AGENT_ACCESS_TOKEN
 
-  - label: "[:linux: build hab-pkg-aci]"
-    command:
-      - .expeditor/scripts/release_habitat/build_component.sh pkg-aci
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - BUILD_PKG_TARGET=x86_64-linux
+  # - label: "[:linux: build hab-pkg-aci]"
+  #   command:
+  #     - .expeditor/scripts/release_habitat/build_component.sh pkg-aci
+  #   expeditor:
+  #     executor:
+  #       docker:
+  #         privileged: true
+  #         environment:
+  #           - BUILD_PKG_TARGET=x86_64-linux
 
-  - label: "[:linux: build hab-pkg-export-docker]"
-    command:
-      - .expeditor/scripts/release_habitat/build_component.sh pkg-export-docker
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - BUILD_PKG_TARGET=x86_64-linux
+  # - label: "[:linux: build hab-pkg-export-docker]"
+  #   command:
+  #     - .expeditor/scripts/release_habitat/build_component.sh pkg-export-docker
+  #   expeditor:
+  #     executor:
+  #       docker:
+  #         privileged: true
+  #         environment:
+  #           - BUILD_PKG_TARGET=x86_64-linux
 
-  - label: "[:windows: build hab-pkg-export-docker]"
-    command:
-      - powershell .expeditor/scripts/release_habitat/build_component.ps1 pkg-export-docker
-    expeditor:
-      executor:
-        docker:
-          host_os: windows
-          environment:
-            - BUILD_PKG_TARGET=x86_64-windows
-            - BUILDKITE_AGENT_ACCESS_TOKEN
+  # - label: "[:windows: build hab-pkg-export-docker]"
+  #   command:
+  #     - powershell .expeditor/scripts/release_habitat/build_component.ps1 pkg-export-docker
+  #   expeditor:
+  #     executor:
+  #       docker:
+  #         host_os: windows
+  #         environment:
+  #           - BUILD_PKG_TARGET=x86_64-windows
+  #           - BUILDKITE_AGENT_ACCESS_TOKEN
 
-  - label: "[:linux: build hab-pkg-export-kubernetes]"
-    command:
-      - .expeditor/scripts/release_habitat/build_component.sh pkg-export-kubernetes
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - BUILD_PKG_TARGET=x86_64-linux
+  # - label: "[:linux: build hab-pkg-export-kubernetes]"
+  #   command:
+  #     - .expeditor/scripts/release_habitat/build_component.sh pkg-export-kubernetes
+  #   expeditor:
+  #     executor:
+  #       docker:
+  #         privileged: true
+  #         environment:
+  #           - BUILD_PKG_TARGET=x86_64-linux
 
-  - label: "[:linux: build hab-pkg-export-helm]"
-    command:
-      - .expeditor/scripts/release_habitat/build_component.sh pkg-export-helm
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - BUILD_PKG_TARGET=x86_64-linux
+  # - label: "[:linux: build hab-pkg-export-helm]"
+  #   command:
+  #     - .expeditor/scripts/release_habitat/build_component.sh pkg-export-helm
+  #   expeditor:
+  #     executor:
+  #       docker:
+  #         privileged: true
+  #         environment:
+  #           - BUILD_PKG_TARGET=x86_64-linux
 
-  - label: "[:linux: build hab-pkg-export-tar]"
-    command:
-      - .expeditor/scripts/release_habitat/build_component.sh pkg-export-tar
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - BUILD_PKG_TARGET=x86_64-linux
+  # - label: "[:linux: build hab-pkg-export-tar]"
+  #   command:
+  #     - .expeditor/scripts/release_habitat/build_component.sh pkg-export-tar
+  #   expeditor:
+  #     executor:
+  #       docker:
+  #         privileged: true
+  #         environment:
+  #           - BUILD_PKG_TARGET=x86_64-linux
 
-  - label: "[:linux: :two: build hab-pkg-export-tar]"
-    command:
-      - .expeditor/scripts/release_habitat/build_component.sh pkg-export-tar
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - BUILD_PKG_TARGET=x86_64-linux-kernel2
+  # - label: "[:linux: :two: build hab-pkg-export-tar]"
+  #   command:
+  #     - .expeditor/scripts/release_habitat/build_component.sh pkg-export-tar
+  #   expeditor:
+  #     executor:
+  #       docker:
+  #         privileged: true
+  #         environment:
+  #           - BUILD_PKG_TARGET=x86_64-linux-kernel2
 
-  - label: "[:windows: build hab-pkg-export-tar]"
-    command:
-      - powershell .expeditor/scripts/release_habitat/build_component.ps1 pkg-export-tar
-    expeditor:
-      executor:
-        docker:
-          host_os: windows
-          environment:
-            - BUILD_PKG_TARGET=x86_64-windows
-            - BUILDKITE_AGENT_ACCESS_TOKEN
+  # - label: "[:windows: build hab-pkg-export-tar]"
+  #   command:
+  #     - powershell .expeditor/scripts/release_habitat/build_component.ps1 pkg-export-tar
+  #   expeditor:
+  #     executor:
+  #       docker:
+  #         host_os: windows
+  #         environment:
+  #           - BUILD_PKG_TARGET=x86_64-windows
+  #           - BUILDKITE_AGENT_ACCESS_TOKEN
 
-  - label: "[:linux: build hab-pkg-mesosize]"
-    command:
-      - .expeditor/scripts/release_habitat/build_component.sh pkg-mesosize
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - BUILD_PKG_TARGET=x86_64-linux
+  # - label: "[:linux: build hab-pkg-mesosize]"
+  #   command:
+  #     - .expeditor/scripts/release_habitat/build_component.sh pkg-mesosize
+  #   expeditor:
+  #     executor:
+  #       docker:
+  #         privileged: true
+  #         environment:
+  #           - BUILD_PKG_TARGET=x86_64-linux
 
   - wait
 
@@ -326,62 +326,62 @@ steps:
             - BUILD_PKG_TARGET=x86_64-windows
             - BUILDKITE_AGENT_ACCESS_TOKEN
 
-  # The cfize export currently has a dependency on
-  # hab-pkg-export-docker, so it must be built after that.
-  - label: "[:linux: build hab-pkg-cfize]"
-    command:
-      - .expeditor/scripts/release_habitat/build_component.sh pkg-cfize
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - BUILD_PKG_TARGET=x86_64-linux
+  # # The cfize export currently has a dependency on
+  # # hab-pkg-export-docker, so it must be built after that.
+  # - label: "[:linux: build hab-pkg-cfize]"
+  #   command:
+  #     - .expeditor/scripts/release_habitat/build_component.sh pkg-cfize
+  #   expeditor:
+  #     executor:
+  #       docker:
+  #         privileged: true
+  #         environment:
+  #           - BUILD_PKG_TARGET=x86_64-linux
 
   - wait
 
   # TODO (CM): It wouldn't take too much additional work to have
   # `package_and_upload_binary.sh` operate on ALL targets at once.
 
-  - label: "[:linux: upload hab binary]"
-    command:
-      - .expeditor/scripts/release_habitat/package_and_upload_binary.sh
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - BUILD_PKG_TARGET=x86_64-linux
+  # - label: "[:linux: upload hab binary]"
+  #   command:
+  #     - .expeditor/scripts/release_habitat/package_and_upload_binary.sh
+  #   expeditor:
+  #     executor:
+  #       docker:
+  #         privileged: true
+  #         environment:
+  #           - BUILD_PKG_TARGET=x86_64-linux
 
-  - label: "[:linux: :two: upload hab binary]"
-    command:
-      - .expeditor/scripts/release_habitat/package_and_upload_binary.sh
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - BUILD_PKG_TARGET=x86_64-linux-kernel2
+  # - label: "[:linux: :two: upload hab binary]"
+  #   command:
+  #     - .expeditor/scripts/release_habitat/package_and_upload_binary.sh
+  #   expeditor:
+  #     executor:
+  #       docker:
+  #         privileged: true
+  #         environment:
+  #           - BUILD_PKG_TARGET=x86_64-linux-kernel2
 
-  - label: "[:windows: upload hab binary]"
-    command:
-      - .expeditor/scripts/release_habitat/package_and_upload_binary.sh
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - BUILD_PKG_TARGET=x86_64-windows
+  # - label: "[:windows: upload hab binary]"
+  #   command:
+  #     - .expeditor/scripts/release_habitat/package_and_upload_binary.sh
+  #   expeditor:
+  #     executor:
+  #       docker:
+  #         privileged: true
+  #         environment:
+  #           - BUILD_PKG_TARGET=x86_64-windows
 
-  - label: "[:mac: upload hab binary]"
-    command:
-      - .expeditor/scripts/release_habitat/package_and_upload_binary.sh
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - BUILD_PKG_TARGET=x86_64-darwin
+  # - label: "[:mac: upload hab binary]"
+  #   command:
+  #     - .expeditor/scripts/release_habitat/package_and_upload_binary.sh
+  #   expeditor:
+  #     executor:
+  #       docker:
+  #         privileged: true
+  #         environment:
+  #           - BUILD_PKG_TARGET=x86_64-darwin
 
   - label: ":docker: Upload containers to Docker Hub"
     command: .expeditor/scripts/release_habitat/dockerhub_upload.sh
@@ -417,10 +417,10 @@ steps:
 
   - wait
 
-  - label: "[:habicat: Generate Manifest and promote to dev channel]"
-    command:
-      - .expeditor/scripts/release_habitat/promote_artifacts_to_dev.sh habitat-release-$BUILDKITE_BUILD_ID
-    expeditor:
-      executor:
-        docker:
-          privileged: true
+  # - label: "[:habicat: Generate Manifest and promote to dev channel]"
+  #   command:
+  #     - .expeditor/scripts/release_habitat/promote_artifacts_to_dev.sh habitat-release-$BUILDKITE_BUILD_ID
+  #   expeditor:
+  #     executor:
+  #       docker:
+  #         privileged: true
