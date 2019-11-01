@@ -911,7 +911,7 @@ fn sub_pkg_bulkupload(ui: &mut UI, m: &ArgMatches<'_>) -> Result<()> {
     if create_origins {
         let mut origins: Vec<String> = Vec::new();
         ui.status(Status::Discovering,
-                  "origin names from artifact metadata..".to_string())?;
+                  String::from("origin names from artifact metadata.."))?;
         for artifact_path in &artifact_paths {
             let ident = PackageArchive::new(&artifact_path).ident()?;
             origins.push(ident.origin);
@@ -919,15 +919,14 @@ fn sub_pkg_bulkupload(ui: &mut UI, m: &ArgMatches<'_>) -> Result<()> {
         origins.sort();
         origins.dedup();
         for origin in &origins {
-            ui.status(Status::Custom(Glyph::CheckMark, "".to_string()), origin)?;
+            ui.status(Status::Custom(Glyph::CheckMark, String::from("")), origin)?;
         }
         ui.status(Status::Found,
                   format!("{} origin(s) that may need to be created.", origins.len()))?;
         if !origins.is_empty() && !accept {
-            ui.warn("Your Builder id will own any origin created. Be sure this is what you \
-                     intend!\nOwnership transfer is not yet implemented and will require SQL \
-                     commands."
-                               .to_string())?;
+            ui.warn(String::from("Your Builder id will own any origin created. Be sure this is \
+                                  what you intend!\nOwnership transfer is not yet implemented \
+                                  and will require SQL commands."))?;
             if !ask_create_origins(ui)? {
                 process::exit(1);
             };
