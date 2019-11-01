@@ -927,7 +927,7 @@ fn sub_pkg_bulkupload(ui: &mut UI, m: &ArgMatches<'_>) -> Result<()> {
                                   what you intend!\nOwnership transfer is not yet implemented \
                                   and will require SQL commands."))?;
             if !ask_create_origins(ui)? {
-                process::exit(1);
+                return Ok(())
             };
         };
         for origin in origins {
