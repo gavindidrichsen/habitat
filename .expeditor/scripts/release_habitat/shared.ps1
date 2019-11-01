@@ -71,3 +71,22 @@ function GetLatestPkgVersionFromChannel($PackageName) {
 function Set-TargetMetadata($PackageIdent) {
     Invoke-Expression "buildkite-agent meta-data set $PackageIdent-x86_64-windows true"
 }
+
+
+function Get-ReleaseChannel {
+    "habitat-release-$Env:BUILDKITE_BUILD_ID"
+}
+
+# Read the contents of the VERSION file. This will be used to
+# determine where generated artifacts go in S3.
+#
+# As long as you don't `cd` out of the repository, this will do the
+# trick.
+function Get-VersionFromRepo {
+    $TopDir=&git rev-parse --show-toplevel
+    if ($Env:DO_FAKE_RELEASE) {
+        Get-Content "$TopDir/VERSION_FAKE"
+    } else {
+        Get-Content "$TopDir/VERSION"
+    }
+}
