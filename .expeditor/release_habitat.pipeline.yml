@@ -391,7 +391,7 @@ steps:
           path: account/static/docker/thesentinels
           field: password
       executor:
-        docker:
+        linux:
           privileged: true
           environment:
             - BUILD_PKG_TARGET=x86_64-linux
@@ -406,7 +406,7 @@ steps:
           path: account/static/docker/thesentinels
           field: password
       executor:
-        docker:
+        linux:
           privileged: true
           environment:
             - BUILD_PKG_TARGET=x86_64-linux-kernel2
