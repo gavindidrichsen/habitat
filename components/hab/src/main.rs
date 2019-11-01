@@ -889,8 +889,7 @@ fn sub_pkg_bulkupload(ui: &mut UI, m: &ArgMatches<'_>) -> Result<()> {
     } else {
         BuildOnUpload::Disable
     };
-    let create_origins = m.is_present("CREATE_ORIGINS");
-    let accept = m.is_present("ACCEPT");
+    let auto_create_origins = m.is_present("AUTO_CREATE_ORIGINS");
     let token = auth_token_param_or_env(m)?;
     const OPTIONS: glob::MatchOptions = glob::MatchOptions { case_sensitive:              true,
                                                              require_literal_separator:   true,
@@ -908,30 +907,27 @@ fn sub_pkg_bulkupload(ui: &mut UI, m: &ArgMatches<'_>) -> Result<()> {
                       key_path.display()))?;
     ui.status(Status::Found,
               format!("{} artifact(s) for upload.", artifact_paths.len()))?;
+    ui.status(Status::Discovering,
+              String::from("origin names from artifact metadata.."))?;
 
-    if create_origins {
-        ui.status(Status::Discovering,
-                  String::from("origin names from artifact metadata.."))?;
-        let mut origins = BTreeSet::new();
-        for artifact_path in &artifact_paths {
-            let ident = PackageArchive::new(&artifact_path).ident()?;
-            origins.insert(ident.origin);
-        }
-        for origin in &origins {
-            ui.status(Status::Custom(Glyph::CheckMark, String::from("")), origin)?;
-        }
-        if !origins.is_empty() && !accept {
-            ui.warn(String::from("Your Builder id will own any origin created. Be sure this is \
-                                  what you intend!\nOwnership transfer is not yet implemented \
-                                  and will require SQL commands."))?;
-            if !ask_create_origins(ui)? {
-                return Ok(())
-            };
+    let mut origins = BTreeSet::new();
+    for artifact_path in &artifact_paths {
+        let ident = PackageArchive::new(&artifact_path).ident()?;
+        origins.insert(ident.origin);
+    }
+    for origin in &origins {
+        ui.status(Status::Custom(Glyph::CheckMark, String::from("")), origin)?;
+    }
+    if !auto_create_origins && !origins.is_empty() {
+        ui.warn(String::from("Origins are required for uploading the artifacts. The Builder \
+                              account that creates the origin is the owner."))?;
+        if !ask_create_origins(ui)? {
+            return Ok(());
         };
-        for origin in origins {
-            command::origin::create::start(ui, &url, &token, &origin)?;
-        }
     };
+    for origin in origins {
+        command::origin::create::start(ui, &url, &token, &origin)?;
+    }
     for artifact_path in &artifact_paths {
         command::pkg::upload::start(ui,
                                     &url,
@@ -1674,7 +1670,7 @@ fn active_target() -> PackageTarget {
 }
 
 fn ask_create_origins(ui: &mut UI) -> Result<bool> {
-    Ok(ui.prompt_yes_no("Do you accept creation and ownership of origins if they do not exist?",
+    Ok(ui.prompt_yes_no("Create any origins that do not exist under your Builder account?",
                         Some(true))?)
 }
 

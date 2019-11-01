@@ -566,8 +566,7 @@ pub fn get(feature_flags: FeatureFlag) -> App<'static, 'static> {
                 (@arg FORCE: --force "Skip checking availability of package and \
                     force uploads, potentially overwriting a stored copy of a package.")
                 (@arg AUTO_BUILD: --("auto-build") "Enable auto-build for all packages in this upload. Only applicable to SaaS Builder.")
-                (@arg CREATE_ORIGINS: --("create-origins") "Create any origins that do not exist in targeted Builder.")
-                (@arg ACCEPT: --("accept") "Do not prompt for confirmation of auto creation and ownership of any origins that do not exist.")
+                (@arg AUTO_CREATE_ORIGINS: --("auto-create-origins") "Do not prompt for confirmation before auto creating any origins that do not exist.")
                 (@arg UPLOAD_DIRECTORY: +required {dir_exists}
                     "Directory Path from which artifacts will be uploaded.")
             )
