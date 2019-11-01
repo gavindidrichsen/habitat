@@ -74,7 +74,8 @@ use habitat_sup_protocol::{self as sup_proto,
                            net::ErrCode,
                            types::*};
 use pbr;
-use std::{env,
+use std::{collections::BTreeSet,
+          env,
           ffi::OsString,
           fs::File,
           io::{self,
@@ -909,15 +910,13 @@ fn sub_pkg_bulkupload(ui: &mut UI, m: &ArgMatches<'_>) -> Result<()> {
               format!("{} artifact(s) for upload.", artifact_paths.len()))?;
 
     if create_origins {
-        let mut origins: Vec<String> = Vec::new();
         ui.status(Status::Discovering,
                   String::from("origin names from artifact metadata.."))?;
+        let mut origins = BTreeSet::new();
         for artifact_path in &artifact_paths {
             let ident = PackageArchive::new(&artifact_path).ident()?;
-            origins.push(ident.origin);
+            origins.insert(ident.origin);
         }
-        origins.sort();
-        origins.dedup();
         for origin in &origins {
             ui.status(Status::Custom(Glyph::CheckMark, String::from("")), origin)?;
         }
