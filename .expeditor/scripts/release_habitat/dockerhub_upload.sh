@@ -28,7 +28,7 @@ image_name_with_tag="${image_name}:${version}"
 # TODO (CM): Pull these credentials from Vault instead
 docker login \
   --username="${DOCKER_LOGIN_USER}" \
-  --password="${DOCKER_LOGIN_PASSWORD}"
+  --password="${MY_SECRET_DOCKER_LOGIN_PASSWORD}"
 
 trap 'rm -f $HOME/.docker/config.json' INT TERM EXIT
 

@@ -386,17 +386,17 @@ steps:
   - label: ":docker: Upload containers to Docker Hub"
     command: .expeditor/scripts/release_habitat/dockerhub_upload.sh
     expeditor:
-      # secrets:
-      #   DOCKER_LOGIN_PASSWORD:
-      #     path: account/static/docker/thesentinels
-      #     field: password
+      secrets:
+        MY_SECRET_DOCKER_LOGIN_PASSWORD:
+          path: account/static/docker/thesentinels
+          field: password
       executor:
         linux:
           privileged: true
           environment:
             - BUILD_PKG_TARGET=x86_64-linux
-            # - DOCKER_LOGIN_USER=thesentinels
-            # - DOCKER_LOGIN_PASSWORD
+            - DOCKER_LOGIN_USER=thesentinels
+            - MY_SECRET_DOCKER_LOGIN_PASSWORD
 
   # - label: ":docker: :two: Upload containers to Docker Hub"
   #   command: .expeditor/scripts/release_habitat/dockerhub_upload.sh
