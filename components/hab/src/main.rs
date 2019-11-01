@@ -920,8 +920,6 @@ fn sub_pkg_bulkupload(ui: &mut UI, m: &ArgMatches<'_>) -> Result<()> {
         for origin in &origins {
             ui.status(Status::Custom(Glyph::CheckMark, String::from("")), origin)?;
         }
-        ui.status(Status::Found,
-                  format!("{} origin(s) that may need to be created.", origins.len()))?;
         if !origins.is_empty() && !accept {
             ui.warn(String::from("Your Builder id will own any origin created. Be sure this is \
                                   what you intend!\nOwnership transfer is not yet implemented \
