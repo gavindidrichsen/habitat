@@ -25,10 +25,12 @@ target="${BUILD_PKG_TARGET}"
 image_name="habitat/default-studio-${target}"
 image_name_with_tag="${image_name}:${version}"
 
-# TODO (CM): Pull these credentials from Vault instead
+# NOTE: This operation currently uses the `chefdelivery` service
+# account; these credentials are automatically injected by the
+# elastic-ci-secrets plugin.
 docker login \
   --username="${DOCKER_LOGIN_USER}" \
-  --password="${MY_SECRET_DOCKER_LOGIN_PASSWORD}"
+  --password="${DOCKER_LOGIN_PASSWORD}"
 
 trap 'rm -f $HOME/.docker/config.json' INT TERM EXIT
 
