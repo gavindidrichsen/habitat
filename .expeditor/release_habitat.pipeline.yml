@@ -387,7 +387,7 @@ steps:
     command: .expeditor/scripts/release_habitat/dockerhub_upload.sh
     expeditor:
       executor:
-        docker:
+        linux:
           privileged: true
           environment:
             - BUILD_PKG_TARGET=x86_64-linux
